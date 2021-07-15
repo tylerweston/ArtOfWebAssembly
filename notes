@@ -1,0 +1,114 @@
+Wat Variables:
+
+Four different data types in WebAssembly:
+i32, i64, f32, and f64. i is Integer, f is floating point, plus the bits used.
+
+Strings and other more complex data types need to be managed directly in linear memory.
+
+We can import global variables that have been declared in JS into our WASM modules.
+Note that JS does not support 64-bit integers, so it is difficult to pass 64-bit integers from WASM to JS.
+JS treats all numbers as 64-bit floating point numbers.
+
+As a stack machine, we can visualize it like this:
+i32.const 3     ;; stack = [3]
+i32.const 2     ;; stack = [2, 3]
+i32.add         ;; 2 and 3 popped from stack, added, 5 pushed to stack, stack = [5]
+
+i32.const 9     ;; stack = [9, 5]
+i32.const 7     ;; stack = [7, 9, 5]
+i32.sub         ;; 7, 9 popped off stack, 9 - 7 pushed onto stack, stack = [2, 5]
+
+i32.mul         ;; 2, 5 popped off stack, 2*5 pushed onto stack, stack = [10]
+
+You can also use indices to keep track of local variables instead of names, something like: local.get 0
+
+Operands must be the same, so we need to cast different types of variables, some examples:
+
+i32.trunc_s/f64         ;; convert a 64-bit float to a 32-bit signed integers
+i32.reinterpret/f32     ;; keep the bits the same but treat a 32-bit float as a 32-bit integers
+i32.wrap/i64            ;; put the 32 bits of an integer into the lower 64 bits
+f32.demote/f64      
+f64.promote/f32
+i64.trunc_u/f64
+etc.
+
+WAT contains some higher level control flow statements like if and else.
+If evaluates any non-zero value to be true.
+
+Boolean operators use i32 and return 1 for true and 0 for false.
+If you wanted to do something like 'if (x > y && y < 6)' the code would be:
+
+(if
+    (i32.and
+        (i32.gt_s (local.get $x) (local.get $y))
+        (i32.lt_s (local.get $y) (i32.const 6))
+    )
+    (then
+        nop ;;... code goes here
+    )
+)
+
+For integers, remember to use _s for signed numbers. For floating point, there is no need
+since they are all signed.
+
+the Block statement:
+Block is used in place of goto, code inside a block can only jump to the end of the block.
+ie.
+(block $jump_to_end
+    br $jump_to_end
+    nop     ;; this code doesn't execute
+)
+nop ;; this is where br jumps to
+
+br_if is used as a conditional branch depending on the top item of the stack.
+
+If you need to jump to the beginning of a block, use a loop:
+
+(loop $not_gonna_loop
+    nop
+)
+;; That doesn't actually loop though! You have to jump manually!
+
+(loop $infinite_loop
+    br $infinite_loop
+)
+;; That loops forever!
+
+You can use branch tables as a kind of switch statement but since you can only break out of a block 
+your code is currently in, you have to nest all your blocks and declare them one after another:
+
+(block $block_0
+(block $block_1
+(block $block_2
+(block $block_3
+(block $block_4
+(block $block_5
+(br_table $block_0 $block_1 $block_2 $block_3 $block_4 $block_5 
+    (local.get $val)
+)
+)   ;;block 5
+i32.const 5
+return
+
+)   ;;block 4
+i32.const 4
+return
+
+)   ;;block 3
+i32.const 3
+return
+
+)   ;;block 2
+i32.const 2
+return
+
+)   ;;block 1
+i32.const 1
+return
+
+)   ;;block 0
+i32.const 0
+return
+
+NOTE that in chrome, this isn't any faster than just using if statements and on FireFox was only 
+noticably faster with dozen+ branches. And it certainly lacks readability!
