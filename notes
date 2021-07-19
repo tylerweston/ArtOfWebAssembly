@@ -1,3 +1,6 @@
+
+Chapter 2:
+
 Wat Variables:
 
 Four different data types in WebAssembly:
@@ -112,3 +115,31 @@ return
 
 NOTE that in chrome, this isn't any faster than just using if statements and on FireFox was only 
 noticably faster with dozen+ branches. And it certainly lacks readability!
+
+Chapter 3:
+
+A WebAssembly module interacts with the embedding environment via imported and exported functions. 
+You can write functions wihtin your module that can be called from the embedding environment.
+It is faster to call a function defined within a WASM module than one defined in JS, from within the module.
+
+So far, all functions have used (export) so they can be called with JS, but not all functions should be exported.
+Small functions that don't do a lot of work will incur too much overhead, should be written in JS.
+The WAT functions that are most useful to export are those that loop over and process lots of data.
+Best to start off a WAT with lots of functions, that as you optimize, inline functions that are called often to
+remove overhead of branching.
+
+Accessing the stack from a function:
+Each function can only pop off values it added to the stack! (Has a sort of frame then?) You must pass in variables
+as parameters you want to use in your function!
+
+Importing functions from JS:
+(import "env" "print_string" (func $print_strin (param i32)))
+Import a function called "print_string" passed in through the env object, which takes one integer parameter.
+Only numbers can be passed as parameters to JS functions.
+
+Faster to call functions directly, as opposed to through the function table, and faster to wall WASM functions
+to avoid overhead of back and forth between JS and WASM.
+js_table_test time=71
+js_import_test=73
+wasm_table_test=30
+wasm_import_test=21
