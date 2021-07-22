@@ -143,3 +143,38 @@ js_table_test time=71
 js_import_test=73
 wasm_table_test=30
 wasm_import_test=21
+
+Data Types:
+i32 (32-bit integer)
+Can be unsigned and represent values from 0 to 4,294,967,295 or signed and represent numbers between -2,147,483,648
+and 2,147,483,647. 
+Negative number is stored in 2s complement, that is, xor (flip) the bits and add 1.
+
+i64 can store a REALLY big range of numbers! in i64, you don't need to specify signed or unsigned for some ops.
+such as i64.add, but some operations like division needs to be specified, like i64.div_s vs i64.div_u.
+Right now, JS does not support i64 natively, but eventually BigInt should be usable for this.
+
+f32:
+1 sign bit
+8 exponent bits (Biased)
+23 bits mantissa
+
+There are some special values as well, 0, -0 are all 0s (Except for sign bit)
+All exponent bits set to 1 and mantissa bits set to 0 is + or - infinity
+If that mantissa bits aren't set to 0, it is NaN (Not a number).
+
+f64 uses 52 bit for significant digits, and an 11 bit exponent and a sign bit. Precise, but usually slower.
+
+Bit shifting:
+Left-shifting is sign-independent. It is the same thing as multipling by 2.
+Right-shifting requires a signed or unsigned shift operation. 
+
+Rotl and rotr are bit rotation, so they flip a bit back around to the other side.
+
+Masking with and/or:
+i32.and or i32.or, 1 for true and 0 for false. 
+Use 0s in a bitmask to clear bits using AND.
+use 1s in a bitmask to set bits using OR.
+
+XOR is used to flip bits. Xoring with 0 will NOT flip a bit, Xoring with 1 WILL flip a bit.
+
