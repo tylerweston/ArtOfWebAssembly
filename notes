@@ -178,3 +178,10 @@ use 1s in a bitmask to set bits using OR.
 
 XOR is used to flip bits. Xoring with 0 will NOT flip a bit, Xoring with 1 WILL flip a bit.
 
+String in WASM:
+WASM doesn't have a built in string type. When working with strings in WASM, you need to know
+what format you're using, ASCII with 7 bits + 1 extra, or Unicode Transformation Format,
+which comes in 7-, 8-, 16-, and 32-bit varieties. 
+To copy string, we could copy byte for byte, but this will be less optimal than copying larger chunks.
+We can copy i64s (8 bytes at a time), but then if we aren't in multiples of 8, we'll also need to copy
+some individual bytes.
