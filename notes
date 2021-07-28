@@ -185,3 +185,29 @@ which comes in 7-, 8-, 16-, and 32-bit varieties.
 To copy string, we could copy byte for byte, but this will be less optimal than copying larger chunks.
 We can copy i64s (8 bytes at a time), but then if we aren't in multiples of 8, we'll also need to copy
 some individual bytes.
+
+Linear Memory:
+A really good use case for WASM is processing lots of data. It can perform math faster than JS so if we
+can bundle a bunch of numbers together and pass them off to WASM, DO IT. We can use linear memory to load
+large amounts of data in JS and then process it within a WASM module.
+
+Linear memory is similar to a heap, think of it as one long array we can access between JS and WASM.
+Linear memory, it is the programmers responsibility to keep track of what is in memory and where it is.
+Once a page is allocated, it cannot be deallocated! 
+
+A page is the smallest chunk of data that can be allocated for a WASM module. A page is 64kb in size.
+Maximum number of pages an app can allocate is 32, 767, or 2GB. NOTE: This may be outdated, since the 
+WASM community group is trying to increase amount of allocatable pages to 65,535.
+To declare memory in a module, use (memory 1) (or however many pages you want). We need to (export) the
+memory from WASM if we declare it in WASM and want to access it in JS.
+We can also declare it in JS:
+const memory = new WebAssembly.Memory({initial: 1})
+and then pass it into our WASM module when we instantiate it, then in WASM:
+(import "js" "mem" (memory 1))
+
+Note that, unlike C, there isn't a distinct pointer type in WASM, we use an i32 that is an index into the 
+linear memory array.
+
+When we work with linear memory inside our WASM module, we need to understnd the data structure at a low level.
+When we want an array of data structures, we need to kno the starting address (base address), stride (size of each
+structure), and the offset of any attributes (how far into the struct we can find any single attribute).

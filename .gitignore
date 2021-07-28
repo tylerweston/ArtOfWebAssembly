@@ -1,2 +1,3 @@
 # ignore compiled WASM
 **/*.wasm
+node_modules/
