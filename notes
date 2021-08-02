@@ -211,3 +211,10 @@ linear memory array.
 When we work with linear memory inside our WASM module, we need to understnd the data structure at a low level.
 When we want an array of data structures, we need to kno the starting address (base address), stride (size of each
 structure), and the offset of any attributes (how far into the struct we can find any single attribute).
+
+The DOM:
+An HTML page is, at it's core, a document. The DOM was designed as a language-independent interface for manipulating
+HTML and XML documents. Because HTML is a tree structure, the DOM represents a document as a logical tree.
+The DOM is how JS and other languages manipulate HTML.
+Since it is usually best to focus the WASM portions of a web app on data processing, DOM manipulation is usually best
+left to the JS portion of the app.
