@@ -218,3 +218,20 @@ HTML and XML documents. Because HTML is a tree structure, the DOM represents a d
 The DOM is how JS and other languages manipulate HTML.
 Since it is usually best to focus the WASM portions of a web app on data processing, DOM manipulation is usually best
 left to the JS portion of the app.
+
+Profiling / Optimization
+Use the browser in incognito mode when profiling, since it won't load website caches, cookies, or Chrome plug-ins.
+Open the site, then choose More Tools > Developer tools and click the performance tab.
+Make sure memory is selected at the top to profile heap memory. Record for about 5 seconds. If you are concerned
+about the startup time, profile from a reload.
+
+wasm-opt
+WASM can be optimized for download size or execution time:
+Download size:
+wasm-opt infile.wasm -Oz -o outfile.wasm
+-Os will be a bit more balanced for execution time
+Optimizing for execution time:
+wasm-opt infile.wasm -O3 -o outfile.wasm
+
+To view bytecode:
+node --print-bytecode --print-bytecode-filter=function_to_view_bytecode_for infile.js
