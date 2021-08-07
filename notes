@@ -235,3 +235,13 @@ wasm-opt infile.wasm -O3 -o outfile.wasm
 
 To view bytecode:
 node --print-bytecode --print-bytecode-filter=function_to_view_bytecode_for infile.js
+
+AssemblyScript:
+run
+asc -h
+to see a list of AssemblyScript compiler command line options
+-O is an optimization flag
+
+WASM modules that AssemblyScript generates always create and export their own memory unless you
+use the --import-Memory flag. Inside importObjects in JS, the object that holds the data for the
+import must have the same name as the AssemblyScript file importing it!
